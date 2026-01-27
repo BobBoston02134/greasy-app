@@ -8,13 +8,14 @@ import { Card } from "@/components/ui/Card";
 
 export default function DonateConfirmPage() {
   const router = useRouter();
-  const { state, setWantsMotivation, isStepComplete } = useDonationFlow();
+  const { state, hydrated, setWantsMotivation, isStepComplete } = useDonationFlow();
 
   useEffect(() => {
+    if (!hydrated) return;
     if (!isStepComplete(5)) {
       router.replace("/donate");
     }
-  }, [isStepComplete, router]);
+  }, [hydrated, isStepComplete, router]);
 
   const handleYes = () => {
     setWantsMotivation(true);
@@ -26,7 +27,7 @@ export default function DonateConfirmPage() {
     router.push("/donate/thank-you");
   };
 
-  if (!isStepComplete(5)) return null;
+  if (!hydrated || !isStepComplete(5)) return null;
 
   return (
     <div className="mx-auto max-w-lg px-4 py-16">

@@ -144,15 +144,16 @@ function PaymentForm() {
 
 export default function DonatePaymentPage() {
   const router = useRouter();
-  const { isStepComplete } = useDonationFlow();
+  const { hydrated, isStepComplete } = useDonationFlow();
 
   useEffect(() => {
+    if (!hydrated) return;
     if (!isStepComplete(4)) {
       router.replace("/donate");
     }
-  }, [isStepComplete, router]);
+  }, [hydrated, isStepComplete, router]);
 
-  if (!isStepComplete(4)) return null;
+  if (!hydrated || !isStepComplete(4)) return null;
 
   return (
     <div className="mx-auto max-w-lg px-4 py-16">

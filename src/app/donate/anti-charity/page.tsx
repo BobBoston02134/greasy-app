@@ -10,13 +10,14 @@ import { RECIPIENTS } from "@/lib/constants";
 
 export default function DonateAntiCharityPage() {
   const router = useRouter();
-  const { state, setAntiCharity, isStepComplete } = useDonationFlow();
+  const { state, hydrated, setAntiCharity, isStepComplete } = useDonationFlow();
 
   useEffect(() => {
+    if (!hydrated) return;
     if (!isStepComplete(6)) {
       router.replace("/donate");
     }
-  }, [isStepComplete, router]);
+  }, [hydrated, isStepComplete, router]);
 
   const antiCharityOptions = RECIPIENTS.filter(
     (r) => r.value !== state.recipient
@@ -31,7 +32,7 @@ export default function DonateAntiCharityPage() {
     }
   };
 
-  if (!isStepComplete(6)) return null;
+  if (!hydrated || !isStepComplete(6)) return null;
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16">

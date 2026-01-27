@@ -32,9 +32,11 @@ function saveState(state: DonationFlowState) {
 
 export function useDonationFlow() {
   const [state, setState] = useState<DonationFlowState>(INITIAL_STATE);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     setState(loadState());
+    setHydrated(true);
   }, []);
 
   const update = useCallback(
@@ -116,6 +118,7 @@ export function useDonationFlow() {
 
   return {
     state,
+    hydrated,
     setAmount,
     setTimeframe,
     setRecipient,

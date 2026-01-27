@@ -16,13 +16,14 @@ const recipientOptions = RECIPIENTS.map((r) => ({
 
 export default function DonateRecipientPage() {
   const router = useRouter();
-  const { state, setRecipient, isStepComplete } = useDonationFlow();
+  const { state, hydrated, setRecipient, isStepComplete } = useDonationFlow();
 
   useEffect(() => {
+    if (!hydrated) return;
     if (!isStepComplete(3)) {
       router.replace("/donate");
     }
-  }, [isStepComplete, router]);
+  }, [hydrated, isStepComplete, router]);
 
   const handleNext = () => {
     if (state.recipient) {
@@ -30,7 +31,7 @@ export default function DonateRecipientPage() {
     }
   };
 
-  if (!isStepComplete(3)) return null;
+  if (!hydrated || !isStepComplete(3)) return null;
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16">

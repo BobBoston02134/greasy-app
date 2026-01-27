@@ -12,17 +12,24 @@ import Link from "next/link";
 
 export default function DonateThankYouPage() {
   const router = useRouter();
-  const { state, reset, isStepComplete } = useDonationFlow();
+  const { state, hydrated, reset, isStepComplete } = useDonationFlow();
   const [phone, setPhone] = useState("");
   const [phoneSaved, setPhoneSaved] = useState(false);
 
-  const [snapshot] = useState(() => ({ ...state }));
+  const [snapshot, setSnapshot] = useState(() => ({ ...state }));
 
   useEffect(() => {
+    if (hydrated && snapshot.amount === null && state.amount !== null) {
+      setSnapshot({ ...state });
+    }
+  }, [hydrated, state, snapshot.amount]);
+
+  useEffect(() => {
+    if (!hydrated) return;
     if (!isStepComplete(7)) {
       router.replace("/donate");
     }
-  }, [isStepComplete, router]);
+  }, [hydrated, isStepComplete, router]);
 
   const recipientLabel =
     RECIPIENTS.find((r) => r.value === snapshot.recipient)?.label ??
@@ -43,7 +50,7 @@ export default function DonateThankYouPage() {
     router.push("/");
   };
 
-  if (!isStepComplete(7)) return null;
+  if (!hydrated || !isStepComplete(7)) return null;
 
   return (
     <div className="mx-auto max-w-lg px-4 py-16">

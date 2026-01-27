@@ -16,13 +16,14 @@ const timeframeOptions = TIMEFRAMES.map((t) => ({
 
 export default function DonateTimeframePage() {
   const router = useRouter();
-  const { state, setTimeframe, isStepComplete } = useDonationFlow();
+  const { state, hydrated, setTimeframe, isStepComplete } = useDonationFlow();
 
 useEffect(() => {
+    if (!hydrated) return;
     if (state.amount === null) {
       router.replace("/donate");
     }
-  }, [state.amount, router]);
+  }, [hydrated, state.amount, router]);
 
   const handleNext = () => {
     if (state.timeframe) {
@@ -30,7 +31,7 @@ useEffect(() => {
     }
   };
 
-  if (!isStepComplete(2)) return null;
+  if (!hydrated || !isStepComplete(2)) return null;
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16">
