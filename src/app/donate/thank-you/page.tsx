@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useDonationFlow } from "@/hooks/useDonationFlow";
 import { Card } from "@/components/ui/Card";
@@ -11,6 +11,7 @@ import Link from "next/link";
 export default function DonateThankYouPage() {
   const router = useRouter();
   const { state, hydrated, reset, isStepComplete } = useDonationFlow();
+  const isLeaving = useRef(false);
 
   const [snapshot, setSnapshot] = useState(() => ({ ...state }));
 
@@ -22,6 +23,7 @@ export default function DonateThankYouPage() {
 
   useEffect(() => {
     if (!hydrated) return;
+    if (isLeaving.current) return;
     if (!isStepComplete(7)) {
       router.replace("/donate");
     }
@@ -37,6 +39,7 @@ export default function DonateThankYouPage() {
     RECIPIENTS.find((r) => r.value === snapshot.antiCharity)?.label ?? null;
 
   const handleDone = () => {
+    isLeaving.current = true;
     reset();
     window.location.href = "/";
   };
