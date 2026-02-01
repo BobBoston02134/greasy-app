@@ -12,6 +12,7 @@ const INITIAL_STATE: DonationFlowState = {
   clientSecret: null,
   wantsMotivation: null,
   antiCharity: null,
+  coverFees: false,
 };
 
 function loadState(): DonationFlowState {
@@ -81,6 +82,11 @@ export function useDonationFlow() {
     [update]
   );
 
+  const setCoverFees = useCallback(
+    (coverFees: boolean) => update({ coverFees }),
+    [update]
+  );
+
   const reset = useCallback(() => {
     if (typeof window !== "undefined") {
       sessionStorage.removeItem(DONATION_STORAGE_KEY);
@@ -125,6 +131,7 @@ export function useDonationFlow() {
     setPaymentIntent,
     setWantsMotivation,
     setAntiCharity,
+    setCoverFees,
     reset,
     isStepComplete,
   };

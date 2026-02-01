@@ -6,11 +6,18 @@ import {
   ALLOWED_RECIPIENTS,
 } from "@/lib/constants";
 
+const PLATFORM_FEE_RATE = 0.025; // 2.5%
+
 export async function POST(request: Request) {
   try {
-    const { amount, recipient, timeframe, customerId } = await request.json();
+    const { amount, recipient, timeframe, customerId, coverFees } = await request.json();
 
-    if (!ALLOWED_AMOUNTS.includes(amount)) {
+    // When coverFees is true, the amount includes the fee, so we need to calculate the base amount
+    const baseAmount = coverFees
+      ? Math.round(amount / (1 + PLATFORM_FEE_RATE))
+      : amount;
+
+    if (!ALLOWED_AMOUNTS.includes(baseAmount)) {
       return NextResponse.json(
         { error: "Invalid donation amount" },
         { status: 400 }
@@ -42,6 +49,8 @@ export async function POST(request: Request) {
         recipient,
         timeframe,
         source: "greasy",
+        coverFees: coverFees ? "true" : "false",
+        baseAmount: String(baseAmount),
       },
     });
 

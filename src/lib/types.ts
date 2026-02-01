@@ -6,6 +6,7 @@ export interface DonationFlowState {
   clientSecret: string | null;
   wantsMotivation: boolean | null;
   antiCharity: string | null;
+  coverFees: boolean;
 }
 
 export interface CreateCustomerRequest {
@@ -22,6 +23,7 @@ export interface CreatePaymentIntentRequest {
   recipient: string;
   timeframe: string;
   customerId?: string;
+  coverFees?: boolean;
 }
 
 export interface CreatePaymentIntentResponse {

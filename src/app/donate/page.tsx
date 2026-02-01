@@ -17,15 +17,9 @@ export default function DonateAmountPage() {
   const { state, setAmount } = useDonationFlow();
   const selectedValue = state.amount !== null ? String(state.amount) : null;
 
-  console.log("DonateAmountPage - Current state:", state);
-
   const handleNext = () => {
-    console.log("handleNext called, amount:", state.amount);
     if (state.amount !== null) {
-      console.log("Navigating to /donate/timeframe");
       router.push("/donate/timeframe");
-    } else {
-      console.log("Amount is null, not navigating");
     }
   };
 

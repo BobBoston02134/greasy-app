@@ -20,12 +20,22 @@ const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 );
 
+const PLATFORM_FEE_RATE = 0.025; // 2.5%
+
+function calculateFeeAmount(amount: number): number {
+  return Math.round(amount * PLATFORM_FEE_RATE);
+}
+
+function calculateTotalWithFees(amount: number): number {
+  return amount + calculateFeeAmount(amount);
+}
+
 function PaymentForm() {
   const router = useRouter();
   const stripe = useStripe();
   const elements = useElements();
   const { data: session } = useSession();
-  const { state, setPaymentIntent } = useDonationFlow();
+  const { state, setPaymentIntent, setCoverFees } = useDonationFlow();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -35,6 +45,10 @@ function PaymentForm() {
   const timeframeLabel =
     TIMEFRAMES.find((t) => t.value === state.timeframe)?.label ??
     state.timeframe;
+
+  const feeAmount = state.amount !== null ? calculateFeeAmount(state.amount) : 0;
+  const totalWithFees = state.amount !== null ? calculateTotalWithFees(state.amount) : 0;
+  const chargeAmount = state.coverFees ? totalWithFees : state.amount;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,10 +62,11 @@ function PaymentForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: state.amount,
+          amount: chargeAmount,
           recipient: state.recipient,
           timeframe: state.timeframe,
           customerId: session?.user?.id,
+          coverFees: state.coverFees,
         }),
       });
 
@@ -88,7 +103,7 @@ function PaymentForm() {
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2 text-sm text-gray-600">
         <div className="flex justify-between">
-          <span>Amount:</span>
+          <span>Donation:</span>
           <span className="font-semibold text-gray-900">
             {state.amount !== null ? formatCurrency(state.amount) : "—"}
           </span>
@@ -103,6 +118,50 @@ function PaymentForm() {
             {timeframeLabel}
           </span>
         </div>
+      </div>
+
+      {/* Platform Fee Coverage Option */}
+      <div className="border-t border-gray-200 pt-4">
+        <label className="flex items-start gap-3 cursor-pointer group">
+          <input
+            type="checkbox"
+            checked={state.coverFees}
+            onChange={(e) => setCoverFees(e.target.checked)}
+            className="mt-1 h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+          />
+          <div className="flex-1">
+            <span className="text-sm text-gray-700 group-hover:text-gray-900">
+              I&apos;ll cover the 2.5% platform fee so 100% of my{" "}
+              {state.amount !== null ? formatCurrency(state.amount) : ""} donation
+              goes to {recipientLabel}
+            </span>
+            {state.amount !== null && (
+              <div className="mt-1 text-xs text-gray-500">
+                Add {formatCurrency(feeAmount)} to cover fees
+              </div>
+            )}
+          </div>
+        </label>
+
+        {state.coverFees && state.amount !== null && (
+          <div className="mt-3 rounded-lg bg-green-50 p-3 text-sm">
+            <div className="flex justify-between text-gray-600">
+              <span>Donation amount:</span>
+              <span>{formatCurrency(state.amount)}</span>
+            </div>
+            <div className="flex justify-between text-gray-600">
+              <span>Platform fee coverage:</span>
+              <span>+{formatCurrency(feeAmount)}</span>
+            </div>
+            <div className="mt-2 flex justify-between border-t border-green-200 pt-2 font-semibold text-gray-900">
+              <span>Total charge:</span>
+              <span>{formatCurrency(totalWithFees)}</span>
+            </div>
+            <p className="mt-2 text-xs text-green-700">
+              Thank you for helping us keep the platform running!
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="border-t border-gray-200 pt-4">
@@ -136,7 +195,7 @@ function PaymentForm() {
         isLoading={loading}
         disabled={!stripe}
       >
-        Pay {state.amount !== null ? formatCurrency(state.amount) : ""}
+        Pay {chargeAmount !== null ? formatCurrency(chargeAmount) : ""}
       </Button>
     </form>
   );
