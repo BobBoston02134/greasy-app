@@ -43,6 +43,7 @@ Last updated: 2026-02-01
 - [x] Remove phone number field from thank-you page (2026-02-01)
 - [x] Add 2.5% fee coverage checkbox at checkout (2026-02-01)
 - [x] Fix donation flow state hydration race condition (commit c7deb29)
+- [x] Add PostHog session recording integration (2026-02-01) - Enables watching user sessions for donation flow analysis
 
 ---
 

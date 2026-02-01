@@ -38,7 +38,7 @@ export default function DonateThankYouPage() {
 
   const handleDone = () => {
     reset();
-    router.push("/");
+    window.location.href = "/";
   };
 
   if (!hydrated || !isStepComplete(7)) return null;
