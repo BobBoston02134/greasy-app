@@ -15,6 +15,7 @@ Last updated: 2026-02-01
 - [ ] **Recurring donations** — Let donors set up weekly/monthly recurring gifts. Depends on account system + webhook infrastructure.
 - [ ] **Admin dashboard** — Password-protected page showing donation count and total volume. Independent of other features.
 - [x] **Request a charity form** — Let users submit requests for charities to be added to the platform. (2026-02-01)
+- [x] **Database for charity requests** — Prisma + SQLite, API routes with validation. (2026-02-01)
 
 ---
 
@@ -55,3 +56,4 @@ Last updated: 2026-02-01
 
 - **Platform fee:** 2.5% on transactions. Donor can opt to cover this at checkout.
 - **Anti-charity concept:** If user fails commitment, donation goes to their designated anti-charity instead of primary recipient.
+- **Database:** Using Prisma ORM with SQLite locally. For Vercel production, need to set up Vercel Postgres or Supabase and update DATABASE_URL.
