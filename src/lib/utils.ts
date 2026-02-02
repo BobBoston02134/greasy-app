@@ -15,7 +15,3 @@ export function formatCurrency(cents: number): string {
 export function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
-
-export function isValidPhone(phone: string): boolean {
-  return /^\+?1?\d{10,14}$/.test(phone.replace(/[\s()-]/g, ""));
-}

@@ -18,7 +18,7 @@ export default function DonateTimeframePage() {
   const router = useRouter();
   const { state, hydrated, setTimeframe, isStepComplete } = useDonationFlow();
 
-useEffect(() => {
+  useEffect(() => {
     if (!hydrated) return;
     if (state.amount === null) {
       router.replace("/donate");

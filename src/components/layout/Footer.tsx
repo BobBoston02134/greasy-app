@@ -18,6 +18,9 @@ export function Footer() {
             <Link href="/donate" className="text-sm text-gray-500 hover:text-green-600">
               Donate
             </Link>
+            <Link href="/request-charity" className="text-sm text-gray-500 hover:text-green-600">
+              Request a Charity
+            </Link>
           </div>
         </div>
       </div>
