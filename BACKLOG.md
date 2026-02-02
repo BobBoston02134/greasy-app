@@ -14,7 +14,7 @@ Last updated: 2026-02-01
 - [ ] **Donation history on account page** — Currently a stub. Need to fetch and display user's past donations from Stripe.
 - [ ] **Recurring donations** — Let donors set up weekly/monthly recurring gifts. Depends on account system + webhook infrastructure.
 - [ ] **Admin dashboard** — Password-protected page showing donation count and total volume. Independent of other features.
-- [ ] **Request a charity form** — Let users submit requests for charities to be added to the platform. Independent of other features.
+- [x] **Request a charity form** — Let users submit requests for charities to be added to the platform. (2026-02-01)
 
 ---
 
@@ -26,19 +26,20 @@ Last updated: 2026-02-01
 - [ ] **API routes have no auth/rate-limiting** — `create-payment-intent` and `create-customer` are publicly callable.
 
 ### High Priority
-- [ ] **Delete `pageOLD.tsx`** (`/src/app/donate/pageOLD.tsx`) — Dead code, should be removed.
 - [ ] **Contact form submissions not persisted** (`/src/app/contact/page.tsx`) — Form shows success but does nothing.
 - [ ] **Deferred payments expire after 7 days** — Manual capture PaymentIntents need a scheduled job or webhook logic.
 
 ### Medium Priority
-- [ ] **`useEffect` indentation** (`/src/app/donate/timeframe/page.tsx:21`) — Cosmetic code cleanup.
 - [ ] **next-auth v4 + Next.js 16 compatibility** — Consider migrating to Auth.js v5.
-- [ ] **`isValidPhone` utility is unused** (`/src/lib/utils.ts:19-21`) — Dead code, remove or use.
 
 ---
 
 ## Completed
 
+- [x] Request a charity form (2026-02-01) — /request-charity page with localStorage storage
+- [x] Delete pageOLD.tsx dead code (2026-02-01)
+- [x] Remove unused isValidPhone utility (2026-02-01)
+- [x] Fix useEffect indentation in timeframe page (2026-02-01)
 - [x] Verify .env.local not in git (2026-02-01) — Already protected by .gitignore, never committed
 - [x] Fix Back to Home navigation on thank-you page (2026-02-01)
 - [x] Add FeedbackWidget for beta tester feedback (2026-02-01)
