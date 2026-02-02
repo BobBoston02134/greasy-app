@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model CharityRequest {
+  id          String   @id @default(cuid())
+  charityName String
+  website     String?
+  reason      String?
+  email       String?
+  createdAt   DateTime @default(now())
+}

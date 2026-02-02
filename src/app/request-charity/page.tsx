@@ -5,52 +5,48 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
-interface CharityRequest {
-  charityName: string;
-  website: string;
-  reason: string;
-  email: string;
-  submittedAt: string;
-}
-
-const STORAGE_KEY = "greasy_charity_requests";
-
-function saveRequest(request: CharityRequest) {
-  try {
-    const existing = localStorage.getItem(STORAGE_KEY);
-    const requests: CharityRequest[] = existing ? JSON.parse(existing) : [];
-    requests.push(request);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(requests));
-  } catch {
-    // If localStorage fails, log to console as backup
-    console.log("[Greasy Charity Request]", request);
-  }
-}
-
 export default function RequestCharityPage() {
   const [submitted, setSubmitted] = useState(false);
   const [charityName, setCharityName] = useState("");
   const [website, setWebsite] = useState("");
   const [reason, setReason] = useState("");
   const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
 
-    const request: CharityRequest = {
-      charityName,
-      website,
-      reason,
-      email,
-      submittedAt: new Date().toISOString(),
-    };
+    try {
+      const response = await fetch("/api/charity-requests", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          charityName,
+          website,
+          reason,
+          email,
+        }),
+      });
 
-    saveRequest(request);
-    setCharityName("");
-    setWebsite("");
-    setReason("");
-    setEmail("");
-    setSubmitted(true);
+      if (!response.ok) {
+        throw new Error("Failed to submit request. Please try again.");
+      }
+
+      setCharityName("");
+      setWebsite("");
+      setReason("");
+      setEmail("");
+      setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -113,8 +109,13 @@ export default function RequestCharityPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <Button type="submit" fullWidth>
-            Submit Request
+          {error && (
+            <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
+              {error}
+            </div>
+          )}
+          <Button type="submit" fullWidth disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit Request"}
           </Button>
         </form>
       </Card>
