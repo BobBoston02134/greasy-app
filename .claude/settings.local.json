@@ -21,7 +21,8 @@
       "Bash(printf:*)",
       "WebFetch(domain:greasy-l1jh77so6-bob-morans-projects.vercel.app)",
       "Bash(nslookup:*)",
-      "WebFetch(domain:sandbox.getgreasy.ai)"
+      "WebFetch(domain:sandbox.getgreasy.ai)",
+      "Bash(node:*)"
     ]
   },
   "spinnerTipsEnabled": true

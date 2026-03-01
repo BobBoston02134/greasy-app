@@ -155,8 +155,9 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("[Create PaymentIntent] Error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to create payment intent" },
+      { error: "Failed to create payment intent", details: errorMessage },
       { status: 500 }
     );
   }
