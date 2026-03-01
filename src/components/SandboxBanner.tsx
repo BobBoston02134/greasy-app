@@ -1,36 +1,39 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export function SandboxBanner() {
-  const [isSandbox, setIsSandbox] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    const hostname = window.location.hostname;
-    const sandbox = hostname.startsWith('sandbox.') || hostname.includes('sandbox');
-    console.log('[SandboxBanner] hostname:', hostname, 'isSandbox:', sandbox);
-    setIsSandbox(sandbox);
+    // Run on client after hydration
+    if (typeof window !== 'undefined') {
+      const host = window.location.hostname;
+      if (host.includes('sandbox')) {
+        setVisible(true);
+      }
+    }
   }, []);
 
-  // Always render after mount, but only show content if sandbox
-  if (!mounted) {
-    return null;
-  }
-
-  if (!isSandbox) {
-    return null;
-  }
+  if (!visible) return null;
 
   return (
-    <div className="bg-amber-500 text-black px-4 py-2 text-center text-sm font-medium fixed top-0 left-0 right-0 z-50">
-      <span className="mr-2">🧪</span>
-      <strong>SANDBOX</strong> — Safe for testing. Use card:{' '}
-      <code className="bg-amber-600/30 px-1.5 py-0.5 rounded font-mono">
-        4242 4242 4242 4242
-      </code>{' '}
-      | Any future date | Any CVV | Nothing is charged.
+    <div
+      style={{
+        backgroundColor: '#f59e0b',
+        color: 'black',
+        padding: '8px 16px',
+        textAlign: 'center',
+        fontSize: '14px',
+        fontWeight: 500,
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 9999,
+      }}
+    >
+      🧪 <strong>SANDBOX</strong> — Safe for testing. Use card: <code style={{ background: 'rgba(0,0,0,0.1)', padding: '2px 6px', borderRadius: '4px' }}>4242 4242 4242 4242</code> | Any future date | Any CVV | Nothing is charged.
     </div>
   );
 }
