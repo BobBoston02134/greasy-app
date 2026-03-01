@@ -8,7 +8,20 @@
       "Bash(cmd //c \"npm run dev\")",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(tree:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm install:*)",
+      "Bash(PGPASSWORD=\"WyxhmrPeWmlSiVfj\" psql:*)",
+      "Bash(node -e \"\nconst { Client } = require\\(''pg''\\);\nconst fs = require\\(''fs''\\);\n\nconst client = new Client\\({\n  connectionString: ''postgresql://postgres.ojjexopjrmtxrtwqmzxy:WyxhmrPeWmlSiVfj@aws-0-us-east-1.pooler.supabase.com:5432/postgres'',\n  ssl: { rejectUnauthorized: false }\n}\\);\n\nasync function run\\(\\) {\n  await client.connect\\(\\);\n  console.log\\(''Connected to Supabase''\\);\n  \n  const schema = fs.readFileSync\\(''database/schema.sql'', ''utf8''\\);\n  \n  try {\n    await client.query\\(schema\\);\n    console.log\\(''Schema executed successfully!''\\);\n  } catch \\(err\\) {\n    console.error\\(''Error:'', err.message\\);\n  }\n  \n  await client.end\\(\\);\n}\n\nrun\\(\\);\n\")",
+      "Bash(node -e \"\nconst { Client } = require\\(''pg''\\);\nconst fs = require\\(''fs''\\);\n\nconst client = new Client\\({\n  connectionString: ''postgresql://postgres:WyxhmrPeWmlSiVfj@db.ojjexopjrmtxrtwqmzxy.supabase.co:5432/postgres'',\n  ssl: { rejectUnauthorized: false }\n}\\);\n\nasync function run\\(\\) {\n  await client.connect\\(\\);\n  console.log\\(''Connected to Supabase''\\);\n  \n  const schema = fs.readFileSync\\(''database/schema.sql'', ''utf8''\\);\n  \n  try {\n    await client.query\\(schema\\);\n    console.log\\(''Schema executed successfully!''\\);\n  } catch \\(err\\) {\n    console.error\\(''Error:'', err.message\\);\n  }\n  \n  await client.end\\(\\);\n}\n\nrun\\(\\);\n\")",
+      "Bash(npm run dev:*)",
+      "Bash(taskkill:*)",
+      "Bash(npx vercel:*)",
+      "Bash(printf:*)",
+      "WebFetch(domain:greasy-l1jh77so6-bob-morans-projects.vercel.app)",
+      "Bash(nslookup:*)",
+      "WebFetch(domain:sandbox.getgreasy.ai)"
     ]
   }
 }

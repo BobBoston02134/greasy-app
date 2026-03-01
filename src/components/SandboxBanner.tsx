@@ -1,10 +1,19 @@
 'use client';
 
-import { shouldShowSandboxBanner } from '@/lib/env';
+import { useState, useEffect } from 'react';
 
 export function SandboxBanner() {
-  // Only render in sandbox environment
-  if (!shouldShowSandboxBanner()) {
+  const [showBanner, setShowBanner] = useState(false);
+
+  useEffect(() => {
+    // Check hostname on client side
+    const hostname = window.location.hostname;
+    if (hostname.startsWith('sandbox.')) {
+      setShowBanner(true);
+    }
+  }, []);
+
+  if (!showBanner) {
     return null;
   }
 
