@@ -23,5 +23,6 @@
       "Bash(nslookup:*)",
       "WebFetch(domain:sandbox.getgreasy.ai)"
     ]
-  }
+  },
+  "spinnerTipsEnabled": true
 }
