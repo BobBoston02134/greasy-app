@@ -3,19 +3,23 @@
 import { useState, useEffect } from 'react';
 
 export function SandboxBanner() {
-  const [showBanner, setShowBanner] = useState(false);
+  const [isSandbox, setIsSandbox] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Check hostname on client side
+    setMounted(true);
     const hostname = window.location.hostname;
-    const isSandbox = hostname.startsWith('sandbox.') || hostname.includes('sandbox');
-    console.log('[SandboxBanner] hostname:', hostname, 'isSandbox:', isSandbox);
-    if (isSandbox) {
-      setShowBanner(true);
-    }
+    const sandbox = hostname.startsWith('sandbox.') || hostname.includes('sandbox');
+    console.log('[SandboxBanner] hostname:', hostname, 'isSandbox:', sandbox);
+    setIsSandbox(sandbox);
   }, []);
 
-  if (!showBanner) {
+  // Always render after mount, but only show content if sandbox
+  if (!mounted) {
+    return null;
+  }
+
+  if (!isSandbox) {
     return null;
   }
 
