@@ -10,8 +10,15 @@
 export type AppEnvironment = 'local' | 'sandbox' | 'production';
 
 export function getAppEnvironment(): AppEnvironment {
-  const envVar = process.env.NEXT_PUBLIC_APP_ENV;
+  // Check hostname first (client-side detection)
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname.startsWith('sandbox.')) return 'sandbox';
+    if (hostname === 'localhost' || hostname === '127.0.0.1') return 'local';
+  }
 
+  // Fall back to env var (server-side)
+  const envVar = process.env.NEXT_PUBLIC_APP_ENV;
   if (envVar === 'production') return 'production';
   if (envVar === 'sandbox') return 'sandbox';
   return 'local';
