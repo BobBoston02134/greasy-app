@@ -5,6 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ShareButton } from "@/components/layout/ShareButton";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
+import { SandboxBanner } from "@/components/SandboxBanner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -34,6 +35,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex min-h-screen flex-col bg-gray-50`}
       >
         <Providers>
+          <SandboxBanner />
           <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />

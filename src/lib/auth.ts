@@ -1,6 +1,7 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { stripe } from "@/lib/stripe";
+import { supabase } from "@/lib/supabase";
+import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -11,38 +12,65 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email) return null;
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
 
-        const customers = await stripe.customers.list({
-          email: credentials.email,
-          limit: 1,
-        });
+        const normalizedEmail = credentials.email.toLowerCase().trim();
 
-        if (customers.data.length === 0) return null;
+        // Fetch user from Supabase
+        const { data: user, error } = await supabase
+          .from("users")
+          .select("id, email, name, password_hash, stripe_customer_id")
+          .eq("email", normalizedEmail)
+          .single();
 
-        const customer = customers.data[0];
+        if (error || !user) {
+          return null;
+        }
+
+        // Verify password
+        if (!user.password_hash) {
+          // User exists but has no password (legacy account)
+          return null;
+        }
+
+        const isValidPassword = await bcrypt.compare(
+          credentials.password,
+          user.password_hash
+        );
+
+        if (!isValidPassword) {
+          return null;
+        }
+
         return {
-          id: customer.id,
-          email: customer.email ?? undefined,
-          name: customer.name ?? undefined,
+          id: user.stripe_customer_id || user.id,
+          email: user.email,
+          name: user.name ?? undefined,
+          dbId: user.id, // Supabase user ID
         };
       },
     }),
   ],
   session: {
     strategy: "jwt",
-    maxAge: 24 * 60 * 60,
+    maxAge: 24 * 60 * 60, // 24 hours
   },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        // @ts-expect-error - dbId is custom field
+        token.dbId = user.dbId;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
+        // @ts-expect-error - dbId is custom field
+        session.user.dbId = token.dbId as string;
       }
       return session;
     },

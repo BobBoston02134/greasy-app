@@ -21,11 +21,18 @@ export default function JoinPage() {
     setError("");
     setLoading(true);
 
+    // Basic password validation
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters");
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch("/api/stripe/create-customer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email }),
+        body: JSON.stringify({ name, email, password }),
       });
 
       const data = await res.json();
@@ -91,9 +98,10 @@ export default function JoinPage() {
             label="Password"
             type="password"
             required
+            minLength={8}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter any password (demo)"
+            placeholder="Minimum 8 characters"
           />
           <Button type="submit" fullWidth isLoading={loading}>
             Create Account

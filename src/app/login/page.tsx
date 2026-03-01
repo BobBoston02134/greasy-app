@@ -30,7 +30,7 @@ export default function LoginPage() {
       if (result?.ok) {
         router.push("/account");
       } else {
-        setError("No account found with that email.");
+        setError("Invalid email or password.");
       }
     } catch {
       setError("Something went wrong. Please try again.");
@@ -67,7 +67,7 @@ export default function LoginPage() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter any password (demo)"
+            placeholder="Your password"
           />
           <Button type="submit" fullWidth isLoading={loading}>
             Log In

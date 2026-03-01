@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
+import { checkRateLimit } from "@/lib/ratelimit";
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -15,6 +16,10 @@ function isValidUrl(url: string): boolean {
 }
 
 export async function POST(request: Request) {
+  // Rate limit: 5 requests per minute (strict)
+  const rateLimitResponse = await checkRateLimit(request, 'strict');
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const body = await request.json();
     const { charityName, website, reason, email } = body;
@@ -43,18 +48,27 @@ export async function POST(request: Request) {
       );
     }
 
-    const charityRequest = await prisma.charityRequest.create({
-      data: {
-        charityName: charityName.trim(),
+    const { data: charityRequest, error } = await supabase
+      .from("charity_requests")
+      .insert({
+        charity_name: charityName.trim(),
         website: website?.trim() || null,
         reason: reason?.trim() || null,
         email: email?.trim() || null,
-      },
-    });
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("[Charity Request API]", error);
+      return NextResponse.json(
+        { error: "Failed to create charity request" },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(charityRequest, { status: 201 });
   } catch (error) {
-    // Log error for debugging but don't expose details to client
     console.error("[Charity Request API]", error);
     return NextResponse.json(
       { error: "Failed to create charity request" },
@@ -65,11 +79,17 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
-    const charityRequests = await prisma.charityRequest.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+    const { data: charityRequests, error } = await supabase
+      .from("charity_requests")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      return NextResponse.json(
+        { error: "Failed to fetch charity requests" },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(charityRequests);
   } catch {
