@@ -1,6 +1,6 @@
 # Greasy App Backlog
 
-Last updated: 2026-03-02 (evening)
+Last updated: 2026-03-09
 
 ---
 
@@ -21,6 +21,7 @@ Every feature we build should be evaluated against this question: **does this he
 4. [ ] **Donation confirmation email** *(new feature)* — send immediate confirmation email after donation completes (separate from check-in email)
 
 #### Remaining Blockers
+- [ ] **DNS / subdomain routing** — `sundai.sandbox.getgreasy.ai` not yet resolving. Cloudflare apex A record may already be correct (76.76.21.21 exists). Need to verify Vercel has confirmed `*.getgreasy.ai` and `*.sandbox.getgreasy.ai` domains and that subdomain routing works end to end.
 - [ ] **Password reset flow** — users who lose access have an active commitment they can't manage. Unacceptable for real money.
 - [ ] **Commitment description field** — users must be able to enter what they're committing to (e.g. "I will run 3x per week for 30 days"). This is the core of the product.
 - [ ] **Default-to-capture warning** — both at signup AND in the check-in email: "No response within X days = your donation goes to your anti-charity"
