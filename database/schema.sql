@@ -83,6 +83,7 @@ CREATE TABLE donations (
   donor_email TEXT, -- for guest donations
   donor_name TEXT,
   notes TEXT,
+  commitment_description TEXT, -- what the donor is committing to accomplish
   checkin_email_sent BOOLEAN DEFAULT FALSE,
 
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -98,6 +99,9 @@ CREATE INDEX idx_donations_created_at ON donations(created_at);
 
 -- Migration: Add checkin_email_sent for commitment tracking
 -- Run: ALTER TABLE donations ADD COLUMN IF NOT EXISTS checkin_email_sent BOOLEAN DEFAULT FALSE;
+
+-- Migration: Add commitment_description for donor commitment text
+-- Run: ALTER TABLE donations ADD COLUMN IF NOT EXISTS commitment_description TEXT;
 CREATE INDEX idx_donations_checkin_pending ON donations(capture_at, checkin_email_sent, status);
 
 -- ============================================

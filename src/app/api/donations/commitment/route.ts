@@ -14,7 +14,7 @@ export async function PATCH(request: Request) {
     const { data: donation, error: fetchError } = await supabase
       .from('donations')
       .select(`
-        id, notes, donor_email, donor_name, amount_cents,
+        id, commitment_description, donor_email, donor_name, amount_cents,
         charity:charities!charity_id(name),
         anti_charity:charities!anti_charity_id(name),
         timeframe, capture_at
@@ -26,10 +26,10 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: 'Donation not found' }, { status: 404 });
     }
 
-    // Update notes
+    // Update commitment description
     const { error: updateError } = await supabase
       .from('donations')
-      .update({ notes: notes ?? null })
+      .update({ commitment_description: notes ?? null })
       .eq('stripe_payment_intent_id', paymentIntentId);
 
     if (updateError) {
