@@ -30,7 +30,7 @@ export default function DonateAmountPage() {
           Step 1: Choose Amount
         </h1>
         <p className="mt-2 text-gray-600">
-          How much would you like to donate?
+          Pick a cause you care about and an anti-charity you&apos;d hate to support. Keep your commitment and your money goes to the good guys — fail, and it goes to the other side.
         </p>
       </div>
 
