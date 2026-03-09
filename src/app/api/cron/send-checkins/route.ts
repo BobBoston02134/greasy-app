@@ -41,8 +41,8 @@ export async function GET(request: Request) {
     let failed = 0;
 
     for (const donation of donations) {
-      const charityData = donation.charity as { name: string } | null;
-      const antiCharityData = donation.anti_charity as { name: string } | null;
+      const charityData = donation.charity as unknown as { name: string } | null;
+      const antiCharityData = donation.anti_charity as unknown as { name: string } | null;
 
       const ok = await sendCheckinEmail({
         to: donation.donor_email!,

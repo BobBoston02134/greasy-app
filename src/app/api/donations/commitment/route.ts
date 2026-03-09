@@ -39,8 +39,8 @@ export async function PATCH(request: Request) {
 
     // Send confirmation email if we have a donor email
     if (donation.donor_email) {
-      const charityData = donation.charity as { name: string } | null;
-      const antiCharityData = donation.anti_charity as { name: string } | null;
+      const charityData = donation.charity as unknown as { name: string } | null;
+      const antiCharityData = donation.anti_charity as unknown as { name: string } | null;
 
       const timeframeLabels: Record<string, string> = {
         immediate: 'immediately',
