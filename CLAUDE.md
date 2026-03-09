@@ -15,6 +15,19 @@ Prompt the user: "Want me to pull up the backlog? We can review what's in progre
 
 **If you find yourself writing code for more than 2-3 steps without spawning an agent, you're doing it wrong.**
 
+### NON-NEGOTIABLE GATES — NEVER SKIP
+
+These three rules are absolute. No exceptions, no shortcuts, no "just this once."
+
+**GATE 1 — Build check before every commit**
+Before any `git commit`, the orchestrator MUST run `npm run build`. If the build fails, no commit happens. The @full-stack-developer fixes the errors first. This is not optional.
+
+**GATE 2 — @qa-engineer before every push**
+Before any `git push`, the orchestrator MUST spawn @qa-engineer to verify the change works as intended and does not break existing flows. No push without QA sign-off.
+
+**GATE 3 — Orchestrator never writes code**
+The orchestrator (main Claude thread) does not write implementation code. Ever. If code needs to be written, fixed, or debugged, delegate to @full-stack-developer. If the orchestrator catches itself writing code, it must stop, spawn the right agent, and hand off. Fixing broken code yourself instead of delegating is a workflow violation.
+
 ### Available Agents
 
 | Agent | Use For |

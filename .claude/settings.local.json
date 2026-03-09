@@ -22,8 +22,15 @@
       "WebFetch(domain:greasy-l1jh77so6-bob-morans-projects.vercel.app)",
       "Bash(nslookup:*)",
       "WebFetch(domain:sandbox.getgreasy.ai)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(git mv:*)",
+      "Bash(git rm:*)",
+      "Bash(xargs grep:*)"
     ]
   },
-  "spinnerTipsEnabled": true
+  "spinnerTipsEnabled": true,
+  "spinnerVerbs": {
+    "mode": "replace",
+    "verbs": []
+  }
 }
