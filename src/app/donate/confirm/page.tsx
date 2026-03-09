@@ -105,16 +105,18 @@ export default function DonateConfirmPage() {
   return (
     <div className="mx-auto max-w-lg px-4 py-16">
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-900">Step 5: Confirm</h1>
+        <h1 className="text-4xl font-bold text-gray-900">Make it count.</h1>
       </div>
 
       <Card className="mt-8 text-center">
         <p className="text-lg text-gray-700">
-          Would you like to use your gift to motivate you to accomplish a result?
+          Do you want to add an accountability target?
         </p>
         <p className="mt-2 text-sm text-gray-500">
-          If yes, you can pick an &ldquo;anti-charity&rdquo; — an organization
-          your donation will go to if you don&apos;t follow through.
+          We&apos;ll check in with you when your deadline arrives. If you followed through, your donation goes to the cause you picked. If not — it goes to your anti-charity.
+        </p>
+        <p className="mt-4 rounded-lg bg-amber-50 px-4 py-2 text-sm text-amber-700">
+          No response to the check-in email = donation goes to your anti-charity automatically.
         </p>
 
         <div className="mt-8 flex gap-4">

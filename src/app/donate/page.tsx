@@ -27,10 +27,10 @@ export default function DonateAmountPage() {
     <div className="mx-auto max-w-2xl px-4 py-16">
       <div className="text-center">
         <h1 className="text-4xl font-bold text-gray-900">
-          Step 1: Choose Amount
+          Put your money where your mouth is.
         </h1>
         <p className="mt-2 text-gray-600">
-          Pick a cause you care about and an anti-charity you&apos;d hate to support. Keep your commitment and your money goes to the good guys — fail, and it goes to the other side.
+          Choose how much you&apos;re putting on the line. Succeed, and it goes to a cause you love. Fail, and it goes somewhere you&apos;d rather not think about.
         </p>
       </div>
 

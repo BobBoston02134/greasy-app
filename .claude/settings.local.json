@@ -25,7 +25,17 @@
       "Bash(node:*)",
       "Bash(git mv:*)",
       "Bash(git rm:*)",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Bash(rm:*)",
+      "Bash(cmd:*)",
+      "Bash(powershell:*)",
+      "Bash(npx next:*)",
+      "Bash(NEXT_TURBOPACK=false npx next:*)",
+      "Bash(npx tsc:*)",
+      "Bash(./node_modules/.bin/tsc:*)",
+      "Bash(npx eslint:*)",
+      "Bash(node_modules/.bin/eslint:*)",
+      "Bash(git:*)"
     ]
   },
   "spinnerTipsEnabled": true,

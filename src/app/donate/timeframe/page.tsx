@@ -37,11 +37,10 @@ export default function DonateTimeframePage() {
     <div className="mx-auto max-w-2xl px-4 py-16">
       <div className="text-center">
         <h1 className="text-4xl font-bold text-gray-900">
-          Step 2: Select Timeframe
+          How long do you need?
         </h1>
         <p className="mt-2 text-gray-600">
-          Your {state.amount !== null ? formatCurrency(state.amount) : ""}{" "}
-          donation — when should it be processed?
+          Set your deadline. This is how long you have to follow through before we check in and ask: did you do it?
         </p>
       </div>
 

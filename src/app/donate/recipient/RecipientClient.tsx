@@ -40,12 +40,11 @@ export default function RecipientClient({ recipientOptions }: RecipientClientPro
     <div className="mx-auto max-w-2xl px-4 py-16">
       <div className="text-center">
         <h1 className="text-4xl font-bold text-gray-900">
-          Step 3: Pick Recipient
+          Who gets the money if you succeed?
         </h1>
         <p className="mt-2 text-gray-600">
-          Where should your{" "}
-          {state.amount !== null ? formatCurrency(state.amount) : ""} donation
-          go?
+          Pick an organization you actually care about. This is your reward for following through — your{" "}
+          {state.amount !== null ? formatCurrency(state.amount) : ""} goes to a cause you believe in.
         </p>
       </div>
 

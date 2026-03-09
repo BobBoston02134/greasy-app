@@ -44,11 +44,10 @@ export default function AntiCharityClient({ availableOptions }: AntiCharityClien
     <div className="mx-auto max-w-2xl px-4 py-16">
       <div className="text-center">
         <h1 className="text-4xl font-bold text-gray-900">
-          Step 6: Anti-Charity
+          Now pick your consequence.
         </h1>
         <p className="mt-2 text-gray-600">
-          Pick an organization you would rather NOT support. If you don&apos;t
-          follow through, your donation goes here instead.
+          Choose the organization your donation goes to if you don&apos;t follow through. Make it one you&apos;d genuinely hate to support — that&apos;s what makes this work.
         </p>
       </div>
 
