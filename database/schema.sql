@@ -83,6 +83,7 @@ CREATE TABLE donations (
   donor_email TEXT, -- for guest donations
   donor_name TEXT,
   notes TEXT,
+  checkin_email_sent BOOLEAN DEFAULT FALSE,
 
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -94,6 +95,10 @@ CREATE INDEX idx_donations_status ON donations(status);
 CREATE INDEX idx_donations_stripe_payment_intent_id ON donations(stripe_payment_intent_id);
 CREATE INDEX idx_donations_capture_at ON donations(capture_at) WHERE status = 'authorized';
 CREATE INDEX idx_donations_created_at ON donations(created_at);
+
+-- Migration: Add checkin_email_sent for commitment tracking
+-- Run: ALTER TABLE donations ADD COLUMN IF NOT EXISTS checkin_email_sent BOOLEAN DEFAULT FALSE;
+CREATE INDEX idx_donations_checkin_pending ON donations(capture_at, checkin_email_sent, status);
 
 -- ============================================
 -- SUBSCRIPTIONS TABLE

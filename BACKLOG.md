@@ -1,6 +1,61 @@
 # Greasy App Backlog
 
-Last updated: 2026-03-01
+Last updated: 2026-03-02 (evening)
+
+---
+
+## North Star: Get Real Money In The Door
+
+Every feature we build should be evaluated against this question: **does this help a real user complete a commitment and authorize a real payment?** Prioritize anything that removes friction from that path. Defer everything else.
+
+---
+
+## Pre-Launch Blockers (Must Fix Before Beta)
+
+### P0 — Hard Blockers
+
+#### Resume Here (next session)
+1. [ ] **Audit null columns** — check which `donations` table columns are still null after a test donation; fix any gaps in the donate flow
+2. [ ] **Test check-in cron manually** — hit `/api/cron/send-checkins` and verify email arrives in Resend dashboard
+3. [ ] **Test Yes/No links in check-in email** — verify Stripe captures payment on "No" and cancels on "Yes"
+4. [ ] **Donation confirmation email** *(new feature)* — send immediate confirmation email after donation completes (separate from check-in email)
+
+#### Remaining Blockers
+- [ ] **Password reset flow** — users who lose access have an active commitment they can't manage. Unacceptable for real money.
+- [ ] **Commitment description field** — users must be able to enter what they're committing to (e.g. "I will run 3x per week for 30 days"). This is the core of the product.
+- [ ] **Default-to-capture warning** — both at signup AND in the check-in email: "No response within X days = your donation goes to your anti-charity"
+- [ ] **End-to-end sandbox test** — full flow: signup → commitment → deadline → capture, verified with Stripe test card
+- [ ] **Stripe webhooks confirmed** receiving events on production
+- [ ] **Admin dashboard live** and verified showing real donations and webhook events
+
+### P1 — Strong Recommendations Before Beta
+- [ ] Cron job monitoring — alert if payment capture fails silently
+- [ ] Manual payment review tool in admin — ability to inspect and override a specific capture
+- [ ] Beta user runbook — written steps for handling refund requests, failed payments, support issues
+
+---
+
+## Iteration Pipeline (Post-Launch, In Priority Order)
+
+### Revenue-Critical
+- [ ] **Frictionless re-commitment** — after a commitment closes, prompt user to start a new one immediately. Retention = revenue.
+- [ ] **Shareable commitment page** — public URL a user can share ("hold me accountable"). Drives organic acquisition.
+- [ ] **Email receipt + commitment confirmation** — sent immediately after signup, summarizing commitment, amount, anti-charity, and deadline
+- [ ] **Reminder emails** — 1 week before deadline: "Your commitment ends soon. Are you on track?"
+
+### Trust & Credibility
+- [ ] **How it works page** — clear, simple explanation of the anti-charity mechanic for first-time visitors
+- [ ] **Success stories / social proof** — even 2-3 real testimonials dramatically improve conversion
+- [ ] **FAQ** — address the obvious questions: "What if I succeed?", "Can I cancel?", "Where does the money actually go?"
+
+### User Experience
+- [ ] **Commitment dashboard** — users see all active and past commitments in one place, with status (active / succeeded / failed)
+- [ ] **Success confirmation flow** — when user clicks "Yes I succeeded", show a congratulations screen and prompt to share or start a new commitment
+- [ ] **Failure acknowledgment flow** — when user clicks "No I failed" or deadline passes, show a graceful screen explaining the donation went through
+
+### Growth
+- [ ] **Referral mechanic** — "invite a friend to hold each other accountable"
+- [ ] **Group commitments** — multiple people commit together, raises stakes socially
 
 ---
 
@@ -67,6 +122,21 @@ Last updated: 2026-03-01
 ### Phase 3: Infrastructure — COMPLETE
 - [x] **Deferred payment auto-capture** — Vercel Cron job runs every 5 minutes
 - [x] **Subscription management** — Users can view/cancel subscriptions from account page
+
+---
+
+## Completed (2026-03-02)
+
+### Check-in Email Feature
+- [x] 3 env vars added to Vercel (Production) and `.env.local`
+- [x] Supabase migration run: `checkin_email_sent` column + index added
+- [x] Stripe check-or-create bug fixed — signup no longer fails when Stripe customer already exists for email
+- [x] Full donate flow tested: payment, commitment yes/no, notes saved to DB
+
+### UI / UX
+- [x] Password visibility toggle on login and join forms
+- [x] Sandbox banner fixes — positioning, hydration, hostname detection, navbar overlap
+- [x] Error details added to payment intent API response
 
 ---
 

@@ -1,14 +1,20 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDonationFlow } from "@/hooks/useDonationFlow";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 
+const MAX_CHARS = 500;
+
 export default function DonateConfirmPage() {
   const router = useRouter();
-  const { state, hydrated, setWantsMotivation, isStepComplete } = useDonationFlow();
+  const { state, hydrated, setWantsMotivation, setCommitmentDescription, isStepComplete } = useDonationFlow();
+  const [phase, setPhase] = useState<'question' | 'describe'>('question');
+  const [description, setDescription] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!hydrated) return;
@@ -17,17 +23,84 @@ export default function DonateConfirmPage() {
     }
   }, [hydrated, isStepComplete, router]);
 
-  const handleYes = () => {
-    setWantsMotivation(true);
-    router.push("/donate/anti-charity");
+  const saveCommitment = async (notes: string | null) => {
+    if (!state.paymentIntentId) return;
+    setSaving(true);
+    setError('');
+    try {
+      const res = await fetch('/api/donations/commitment', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentIntentId: state.paymentIntentId, notes }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || 'Failed to save commitment');
+        setSaving(false);
+        return false;
+      }
+      return true;
+    } catch {
+      setError('Something went wrong. Please try again.');
+      setSaving(false);
+      return false;
+    }
   };
 
-  const handleNo = () => {
+  const handleYes = () => {
+    setWantsMotivation(true);
+    setPhase('describe');
+  };
+
+  const handleNo = async () => {
     setWantsMotivation(false);
-    router.push("/donate/thank-you");
+    setCommitmentDescription(null);
+    const ok = await saveCommitment(null);
+    if (ok) router.push("/donate/thank-you");
+  };
+
+  const handleDescriptionSubmit = async () => {
+    const trimmed = description.trim() || null;
+    setCommitmentDescription(trimmed);
+    const ok = await saveCommitment(trimmed);
+    if (ok) router.push("/donate/anti-charity");
   };
 
   if (!hydrated || !isStepComplete(5)) return null;
+
+  if (phase === 'describe') {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-16">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gray-900">What are you committing to?</h1>
+          <p className="mt-2 text-gray-600">Describe your commitment in a sentence or two. This will appear in your check-in email.</p>
+        </div>
+
+        <Card className="mt-8">
+          <div className="space-y-4">
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value.slice(0, MAX_CHARS))}
+              placeholder="e.g. Finish the product demo by Friday at 5pm"
+              rows={4}
+              className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 resize-none"
+            />
+            <div className="text-right text-xs text-gray-400">
+              {description.length}/{MAX_CHARS}
+            </div>
+
+            {error && (
+              <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>
+            )}
+
+            <Button onClick={handleDescriptionSubmit} fullWidth isLoading={saving}>
+              {description.trim() ? 'Save & Pick Anti-Charity' : 'Skip & Pick Anti-Charity'}
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-lg px-4 py-16">
@@ -48,10 +121,14 @@ export default function DonateConfirmPage() {
           <Button onClick={handleYes} fullWidth>
             Yes, Motivate Me
           </Button>
-          <Button onClick={handleNo} variant="outline" fullWidth>
+          <Button onClick={handleNo} variant="outline" fullWidth isLoading={saving}>
             No, Thank You
           </Button>
         </div>
+
+        {error && (
+          <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>
+        )}
       </Card>
     </div>
   );

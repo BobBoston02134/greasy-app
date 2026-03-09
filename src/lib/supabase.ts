@@ -69,6 +69,7 @@ export interface Donation {
   donor_email: string | null;
   donor_name: string | null;
   notes: string | null;
+  checkin_email_sent: boolean;
   created_at: string;
   updated_at: string;
 }

@@ -35,9 +35,11 @@ function PaymentForm() {
   const stripe = useStripe();
   const elements = useElements();
   const { data: session } = useSession();
-  const { state, setPaymentIntent, setCoverFees } = useDonationFlow();
+  const { state, setPaymentIntent, setCoverFees, setDonorInfo } = useDonationFlow();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [guestEmail, setGuestEmail] = useState('');
+  const [guestName, setGuestName] = useState('');
 
   const recipientLabel =
     RECIPIENTS.find((r) => r.value === state.recipient)?.label ??
@@ -67,6 +69,8 @@ function PaymentForm() {
           timeframe: state.timeframe,
           customerId: session?.user?.id,
           coverFees: state.coverFees,
+          donorEmail: session?.user?.email || guestEmail || undefined,
+          donorName: session?.user?.name || guestName || undefined,
         }),
       });
 
@@ -91,6 +95,12 @@ function PaymentForm() {
         return;
       }
 
+      if (session?.user?.email || guestEmail) {
+        setDonorInfo(
+          session?.user?.email || guestEmail,
+          session?.user?.name || guestName || ''
+        );
+      }
       setPaymentIntent(paymentIntentId, clientSecret);
       router.push("/donate/confirm");
     } catch {
@@ -119,6 +129,35 @@ function PaymentForm() {
           </span>
         </div>
       </div>
+
+      {!session?.user && (
+        <div className="space-y-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Your Name <span className="text-gray-400">(optional)</span>
+            </label>
+            <input
+              type="text"
+              value={guestName}
+              onChange={(e) => setGuestName(e.target.value)}
+              placeholder="Jane Smith"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email Address <span className="text-gray-400">(for commitment reminders)</span>
+            </label>
+            <input
+              type="email"
+              value={guestEmail}
+              onChange={(e) => setGuestEmail(e.target.value)}
+              placeholder="you@example.com"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Platform Fee Coverage Option */}
       <div className="border-t border-gray-200 pt-4">

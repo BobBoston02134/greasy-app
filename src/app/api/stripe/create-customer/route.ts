@@ -42,28 +42,23 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check Stripe as fallback
+    // Reuse existing Stripe customer if one exists for this email
     const existingStripe = await stripe.customers.list({
       email: normalizedEmail,
       limit: 1,
     });
 
-    if (existingStripe.data.length > 0) {
-      return NextResponse.json(
-        { error: "Customer with this email already exists" },
-        { status: 400 }
-      );
-    }
-
-    // Create Stripe customer
-    const customer = await stripe.customers.create({
-      name: name.trim(),
-      email: normalizedEmail,
-      metadata: {
-        source: "greasy",
-        created_at: new Date().toISOString(),
-      },
-    });
+    const customerExisted = existingStripe.data.length > 0;
+    const customer = customerExisted
+      ? existingStripe.data[0]
+      : await stripe.customers.create({
+          name: name.trim(),
+          email: normalizedEmail,
+          metadata: {
+            source: "greasy",
+            created_at: new Date().toISOString(),
+          },
+        });
 
     // Hash password if provided
     const passwordHash = password ? await bcrypt.hash(password, 12) : null;
@@ -77,8 +72,8 @@ export async function POST(request: Request) {
     });
 
     if (insertError) {
-      // Rollback: delete Stripe customer if DB insert fails
-      await stripe.customers.del(customer.id);
+      // Rollback: only delete Stripe customer if we just created it
+      if (!customerExisted) await stripe.customers.del(customer.id);
       console.error("[Create Customer] DB insert failed:", insertError);
       return NextResponse.json(
         { error: "Failed to create account" },

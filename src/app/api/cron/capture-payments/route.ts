@@ -21,7 +21,7 @@ export async function GET(request: Request) {
     // Status = 'authorized' and capture_at <= now
     const { data: donations, error: fetchError } = await supabase
       .from("donations")
-      .select("id, stripe_payment_intent_id, amount_cents, capture_at")
+      .select("id, stripe_payment_intent_id, amount_cents, capture_at, checkin_email_sent, commitment_verified")
       .eq("status", "authorized")
       .lte("capture_at", now)
       .not("stripe_payment_intent_id", "is", null);
@@ -51,6 +51,17 @@ export async function GET(request: Request) {
 
     // Process each donation
     for (const donation of donations) {
+      // Skip donations in 48-hour grace window:
+      // Check-in was sent, no response yet, and deadline was less than 48hr ago
+      if (donation.checkin_email_sent && donation.commitment_verified === null) {
+        const captureAt = new Date(donation.capture_at!);
+        const hoursSinceDeadline = (Date.now() - captureAt.getTime()) / (1000 * 60 * 60);
+        if (hoursSinceDeadline < 48) {
+          console.log(`[Cron] Skipping donation ${donation.id} — in 48hr grace window`);
+          continue;
+        }
+      }
+
       try {
         // Capture the payment intent
         const paymentIntent = await stripe.paymentIntents.capture(

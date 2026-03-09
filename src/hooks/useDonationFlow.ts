@@ -13,6 +13,9 @@ const INITIAL_STATE: DonationFlowState = {
   wantsMotivation: null,
   antiCharity: null,
   coverFees: false,
+  commitmentDescription: null,
+  donorEmail: null,
+  donorName: null,
 };
 
 function loadState(): DonationFlowState {
@@ -87,6 +90,16 @@ export function useDonationFlow() {
     [update]
   );
 
+  const setCommitmentDescription = useCallback(
+    (commitmentDescription: string | null) => update({ commitmentDescription }),
+    [update]
+  );
+
+  const setDonorInfo = useCallback(
+    (donorEmail: string, donorName: string) => update({ donorEmail, donorName }),
+    [update]
+  );
+
   const reset = useCallback(() => {
     if (typeof window !== "undefined") {
       sessionStorage.removeItem(DONATION_STORAGE_KEY);
@@ -132,6 +145,8 @@ export function useDonationFlow() {
     setWantsMotivation,
     setAntiCharity,
     setCoverFees,
+    setCommitmentDescription,
+    setDonorInfo,
     reset,
     isStepComplete,
   };

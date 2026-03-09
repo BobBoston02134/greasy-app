@@ -7,6 +7,9 @@ export interface DonationFlowState {
   wantsMotivation: boolean | null;
   antiCharity: string | null;
   coverFees: boolean;
+  commitmentDescription: string | null;
+  donorEmail: string | null;
+  donorName: string | null;
 }
 
 export interface CreateCustomerRequest {
