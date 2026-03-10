@@ -35,7 +35,8 @@
       "Bash(./node_modules/.bin/tsc:*)",
       "Bash(npx eslint:*)",
       "Bash(node_modules/.bin/eslint:*)",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "Bash(ls:*)"
     ]
   },
   "spinnerTipsEnabled": true,
