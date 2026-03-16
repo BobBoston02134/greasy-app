@@ -69,6 +69,7 @@ Every feature we build should be evaluated against this question: **does this he
 ### 2. Run Database Schema
 - [ ] Open SQL Editor in dev project → run `/database/schema.sql`
 - [ ] Open SQL Editor in prod project → run `/database/schema.sql`
+- [ ] Verify `contact_submissions` table exists in Supabase dev and prod projects (required for feedback widget)
 
 ### 3. Update Local Environment
 - [ ] Replace placeholder values in `.env.local` with your dev project credentials
@@ -76,6 +77,7 @@ Every feature we build should be evaluated against this question: **does this he
 ### 4. Configure Vercel Deployments
 - [ ] Set sandbox.greasy.ai env vars (see Environment Configuration below)
 - [ ] Set greasy.ai env vars (see Environment Configuration below)
+- [ ] Set `EMAIL_VERIFY_SECRET` env var in Vercel (sandbox + production) — required for secure password reset tokens
 
 ### 5. Set Up Upstash Redis (Optional but Recommended)
 - [ ] Create free account at upstash.com

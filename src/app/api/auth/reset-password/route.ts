@@ -12,6 +12,10 @@ if (!RESEND_API_KEY) {
   console.warn("[reset-password] WARNING: RESEND_API_KEY is not set — password reset emails will not be sent.");
 }
 
+if (!RESET_SECRET) {
+  console.warn("[reset-password] WARNING: EMAIL_VERIFY_SECRET is not set — reset tokens are insecure.");
+}
+
 // Token expires in 1 hour
 const TOKEN_TTL_MS = 60 * 60 * 1000;
 

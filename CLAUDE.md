@@ -23,7 +23,7 @@ These three rules are absolute. No exceptions, no shortcuts, no "just this once.
 Before any `git commit`, the orchestrator MUST run `npm run build`. If the build fails, no commit happens. The @full-stack-developer fixes the errors first. This is not optional.
 
 **GATE 2 — @qa-engineer before every push**
-Before any `git push`, the orchestrator MUST spawn @qa-engineer to verify the change works as intended and does not break existing flows. No push without QA sign-off.
+Before any `git push`, the orchestrator MUST spawn @qa-engineer to verify the change works as intended and does not break existing flows. No push without QA sign-off. No task may be marked complete until @qa-engineer has reviewed and signed off.
 
 **GATE 3 — Orchestrator never writes code**
 The orchestrator (main Claude thread) does not write implementation code. Ever. If code needs to be written, fixed, or debugged, delegate to @full-stack-developer. If the orchestrator catches itself writing code, it must stop, spawn the right agent, and hand off. Fixing broken code yourself instead of delegating is a workflow violation.
@@ -79,6 +79,7 @@ Greasy is a motivational fundraising platform where donors can designate an "ant
 - Keep technical details minimal unless asked
 - Focus on priorities, sequences, and trade-offs
 - **Delegate to agents** — don't do all the work yourself
+- **Full autonomy** — write code, commit, and push without asking for confirmation. Just do it and report what was done.
 
 ## Feature Flags — MANDATORY CONVENTION
 
