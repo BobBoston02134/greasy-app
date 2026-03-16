@@ -2,11 +2,15 @@
   "crons": [
     {
       "path": "/api/cron/capture-payments",
-      "schedule": "0 0 * * *"
+      "schedule": "*/5 * * * *"
     },
     {
       "path": "/api/cron/send-checkins",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/send-reminders",
+      "schedule": "0 9 * * *"
     }
   ]
 }

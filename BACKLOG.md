@@ -1,6 +1,6 @@
 # Greasy App Backlog
 
-Last updated: 2026-03-09
+Last updated: 2026-03-16
 
 ---
 
@@ -15,48 +15,48 @@ Every feature we build should be evaluated against this question: **does this he
 ### P0 — Hard Blockers
 
 #### Resume Here (next session)
-1. [ ] **Audit null columns** — check which `donations` table columns are still null after a test donation; fix any gaps in the donate flow
-2. [ ] **Test check-in cron manually** — hit `/api/cron/send-checkins` and verify email arrives in Resend dashboard
-3. [ ] **Test Yes/No links in check-in email** — verify Stripe captures payment on "No" and cancels on "Yes"
-4. [ ] **Donation confirmation email** *(new feature)* — send immediate confirmation email after donation completes (separate from check-in email)
+1. [x] **Audit null columns** — fixed: `anti_charity_id` was never written (anti-charity chosen after payment); now written via PATCH at the anti-charity step. `commitment_description` field fix was also applied to check-in cron (was reading `notes`, now reads `commitment_description`).
+2. [ ] **Test check-in cron manually** — requires deployed env: hit `/api/cron/send-checkins` and verify email arrives in Resend dashboard (USER ACTION REQUIRED)
+3. [ ] **Test Yes/No links in check-in email** — verify Stripe captures payment on "No" and cancels on "Yes" (USER ACTION REQUIRED — needs real test donation)
+4. [x] **Donation confirmation email** — already implemented; now correctly only sends on final step of flow (not duplicated)
 
 #### Remaining Blockers
-- [ ] **DNS / subdomain routing** — `sundai.sandbox.getgreasy.ai` not yet resolving. Cloudflare apex A record may already be correct (76.76.21.21 exists). Need to verify Vercel has confirmed `*.getgreasy.ai` and `*.sandbox.getgreasy.ai` domains and that subdomain routing works end to end.
-- [ ] **Password reset flow** — users who lose access have an active commitment they can't manage. Unacceptable for real money.
-- [ ] **Commitment description field** — users must be able to enter what they're committing to (e.g. "I will run 3x per week for 30 days"). This is the core of the product.
-- [ ] **Default-to-capture warning** — both at signup AND in the check-in email: "No response within X days = your donation goes to your anti-charity"
-- [ ] **End-to-end sandbox test** — full flow: signup → commitment → deadline → capture, verified with Stripe test card
-- [ ] **Stripe webhooks confirmed** receiving events on production
-- [ ] **Admin dashboard live** and verified showing real donations and webhook events
+- [ ] **DNS / subdomain routing** — `sundai.sandbox.getgreasy.ai` not yet resolving. Cloudflare apex A record may already be correct (76.76.21.21 exists). Need to verify Vercel has confirmed `*.getgreasy.ai` and `*.sandbox.getgreasy.ai` domains and that subdomain routing works end to end. (USER ACTION REQUIRED)
+- [x] **Password reset flow** — fully implemented at `/forgot-password`
+- [x] **Commitment description field** — implemented in donation flow
+- [x] **Default-to-capture warning** — present in confirm step (amber callout) and check-in email footer
+- [ ] **End-to-end sandbox test** — full flow: signup → commitment → deadline → capture, verified with Stripe test card (USER ACTION REQUIRED)
+- [ ] **Stripe webhooks confirmed** receiving events on production (USER ACTION REQUIRED — configure in Stripe Dashboard)
+- [ ] **Admin dashboard live** — built and deployed; verify it loads at /admin after setting `is_admin = true` on your account (USER ACTION REQUIRED)
 
 ### P1 — Strong Recommendations Before Beta
-- [ ] Cron job monitoring — alert if payment capture fails silently
-- [ ] Manual payment review tool in admin — ability to inspect and override a specific capture
-- [ ] Beta user runbook — written steps for handling refund requests, failed payments, support issues
+- [x] Cron job monitoring — `sendAdminAlert` fires on capture failures; set `ADMIN_ALERT_EMAIL` env var in Vercel to receive alerts
+- [x] Manual payment review tool in admin — Payment Review section in `/admin` with Capture/Cancel controls; API at `/api/admin/donations`
+- [x] Beta user runbook — see `RUNBOOK.md`
 
 ---
 
 ## Iteration Pipeline (Post-Launch, In Priority Order)
 
 ### Revenue-Critical
-- [ ] **Frictionless re-commitment** — after a commitment closes, prompt user to start a new one immediately. Retention = revenue.
-- [ ] **Shareable commitment page** — public URL a user can share ("hold me accountable"). Drives organic acquisition.
-- [ ] **Email receipt + commitment confirmation** — sent immediately after signup, summarizing commitment, amount, anti-charity, and deadline
-- [ ] **Reminder emails** — 1 week before deadline: "Your commitment ends soon. Are you on track?"
+- [x] **Frictionless re-commitment** — built, behind `ENABLE_FRICTIONLESS_RECOMMITMENT` flag (default off)
+- [x] **Shareable commitment page** — built at `/c/[id]`, behind `ENABLE_SHAREABLE_COMMITMENT_PAGE` flag (default off)
+- [x] **Email receipt + commitment confirmation** — already implemented; fires on final step of donation flow
+- [x] **Reminder emails** — cron at `/api/cron/send-reminders`, behind `ENABLE_REMINDER_EMAILS` flag (default off); sends 7 days before deadline
 
 ### Trust & Credibility
-- [ ] **How it works page** — clear, simple explanation of the anti-charity mechanic for first-time visitors
-- [ ] **Success stories / social proof** — even 2-3 real testimonials dramatically improve conversion
-- [ ] **FAQ** — address the obvious questions: "What if I succeed?", "Can I cancel?", "Where does the money actually go?"
+- [x] **How it works page** — built at `/how-it-works`, behind `ENABLE_HOW_IT_WORKS_PAGE` flag (default off)
+- [ ] **Success stories / social proof** — requires real user testimonials; no code work until you have content
+- [x] **FAQ** — built at `/faq`, behind `ENABLE_FAQ_PAGE` flag (default off)
 
 ### User Experience
-- [ ] **Commitment dashboard** — users see all active and past commitments in one place, with status (active / succeeded / failed)
-- [ ] **Success confirmation flow** — when user clicks "Yes I succeeded", show a congratulations screen and prompt to share or start a new commitment
-- [ ] **Failure acknowledgment flow** — when user clicks "No I failed" or deadline passes, show a graceful screen explaining the donation went through
+- [x] **Commitment dashboard** — built at `/commitments`, behind `ENABLE_COMMITMENT_DASHBOARD` flag (default off)
+- [x] **Success confirmation flow** — built at `/commitment/success`, behind `ENABLE_SUCCESS_FAILURE_FLOWS` flag (default off)
+- [x] **Failure acknowledgment flow** — built at `/commitment/failure`, behind `ENABLE_SUCCESS_FAILURE_FLOWS` flag (default off)
 
 ### Growth
-- [ ] **Referral mechanic** — "invite a friend to hold each other accountable"
-- [ ] **Group commitments** — multiple people commit together, raises stakes socially
+- [ ] **Referral mechanic** — not yet built; flag `ENABLE_REFERRAL_MECHANIC` reserved in flags.ts
+- [ ] **Group commitments** — not yet built; flag `ENABLE_GROUP_COMMITMENTS` reserved in flags.ts
 
 ---
 
@@ -210,6 +210,7 @@ UPSTASH_REDIS_REST_TOKEN=[from Upstash console]
 CRON_SECRET=[generate: openssl rand -base64 32]
 NEXT_PUBLIC_POSTHOG_KEY=...
 NEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com
+ADMIN_ALERT_EMAIL=your@email.com
 ```
 
 **Production Deployment (greasy.ai):**
@@ -229,6 +230,7 @@ UPSTASH_REDIS_REST_TOKEN=[from Upstash console]
 CRON_SECRET=[generate: openssl rand -base64 32]
 NEXT_PUBLIC_POSTHOG_KEY=...
 NEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com
+ADMIN_ALERT_EMAIL=your@email.com
 ```
 
 ---
@@ -265,7 +267,9 @@ Rate limiting is optional — disabled if Upstash credentials not configured.
 
 | Job | Schedule | Purpose |
 |-----|----------|---------|
-| `/api/cron/capture-payments` | Every 5 min | Captures deferred payments when `capture_at` time is reached |
+| `/api/cron/capture-payments` | Every 5 min | Captures deferred payments when `capture_at` time is reached; alerts admin on failures |
+| `/api/cron/send-checkins` | Daily 8am | Sends check-in emails for donations due within 24 hours |
+| `/api/cron/send-reminders` | Daily 9am | Sends 1-week-before reminders (behind `ENABLE_REMINDER_EMAILS` flag) |
 
 ---
 

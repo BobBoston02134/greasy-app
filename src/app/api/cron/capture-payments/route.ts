@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { supabase } from "@/lib/supabase";
+import { sendAdminAlert } from "@/lib/email";
 
 // This endpoint is called by Vercel Cron every 5 minutes
 // See vercel.json for cron configuration
@@ -99,6 +100,14 @@ export async function GET(request: Request) {
     }
 
     console.log(`[Cron] Capture complete: ${results.captured} captured, ${results.failed} failed`);
+
+    // Send admin alert if any captures failed
+    if (results.failed > 0) {
+      await sendAdminAlert(
+        `${results.failed} payment capture(s) failed`,
+        `Captured: ${results.captured}\nFailed: ${results.failed}\n\nErrors:\n${results.errors.join('\n')}\n\nTimestamp: ${new Date().toISOString()}`
+      );
+    }
 
     return NextResponse.json({
       message: "Capture job complete",

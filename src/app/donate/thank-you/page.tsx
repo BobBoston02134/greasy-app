@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { RECIPIENTS, TIMEFRAMES } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
+import { ENABLE_FRICTIONLESS_RECOMMITMENT, ENABLE_SHAREABLE_COMMITMENT_PAGE } from "@/lib/flags";
 
 export default function DonateThankYouPage() {
   const router = useRouter();
@@ -107,17 +108,54 @@ export default function DonateThankYouPage() {
         )}
       </Card>
 
+      {ENABLE_SHAREABLE_COMMITMENT_PAGE && snapshot.paymentIntentId && (
+        <div className="mt-6 rounded-lg border border-gray-200 bg-white p-4">
+          <p className="text-sm font-semibold text-gray-700">Share your commitment</p>
+          <p className="mt-1 text-xs text-gray-500">Send this link to someone who will hold you accountable.</p>
+          <div className="mt-2 flex items-center gap-2">
+            <input
+              readOnly
+              value={`${window.location.origin}/c/${snapshot.paymentIntentId}`}
+              className="flex-1 rounded border border-gray-300 px-2 py-1 text-xs text-gray-700 font-mono"
+              onFocus={(e) => e.target.select()}
+            />
+            <button
+              onClick={() => navigator.clipboard.writeText(`${window.location.origin}/c/${snapshot.paymentIntentId}`)}
+              className="rounded bg-gray-100 px-2 py-1 text-xs text-gray-600 hover:bg-gray-200"
+            >
+              Copy
+            </button>
+          </div>
+        </div>
+      )}
+
+      {ENABLE_FRICTIONLESS_RECOMMITMENT && (
+        <div className="mt-6 rounded-lg border-2 border-green-100 bg-green-50 p-4 text-center">
+          <p className="font-semibold text-green-800">Ready to lock in your next commitment?</p>
+          <p className="mt-1 text-sm text-green-700">Keep the momentum going.</p>
+          <Link
+            href="/donate"
+            onClick={() => reset()}
+            className="mt-3 inline-block rounded-lg bg-green-600 px-6 py-2 font-semibold text-white hover:bg-green-700 transition-colors"
+          >
+            Start New Commitment
+          </Link>
+        </div>
+      )}
+
       <div className="mt-8 flex gap-4">
-        <Link
-          href="/donate"
-          onClick={() => reset()}
-          className="flex-1 rounded-lg border-2 border-green-600 px-4 py-3 text-center font-semibold text-green-600 hover:bg-green-50 transition-colors"
-        >
-          Donate Again
-        </Link>
+        {!ENABLE_FRICTIONLESS_RECOMMITMENT && (
+          <Link
+            href="/donate"
+            onClick={() => reset()}
+            className="flex-1 rounded-lg border-2 border-green-600 px-4 py-3 text-center font-semibold text-green-600 hover:bg-green-50 transition-colors"
+          >
+            Donate Again
+          </Link>
+        )}
         <button
           onClick={handleDone}
-          className="flex-1 rounded-lg bg-green-600 px-4 py-3 text-center font-semibold text-white hover:bg-green-700 transition-colors"
+          className={`rounded-lg bg-green-600 px-4 py-3 text-center font-semibold text-white hover:bg-green-700 transition-colors ${ENABLE_FRICTIONLESS_RECOMMITMENT ? "w-full" : "flex-1"}`}
         >
           Back to Home
         </button>

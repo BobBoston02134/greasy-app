@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { supabase } from '@/lib/supabase';
 import { verifyToken } from '@/lib/email';
+import { ENABLE_SUCCESS_FAILURE_FLOWS } from '@/lib/flags';
 
 function htmlPage(title: string, message: string, color: string): NextResponse {
   const html = `<!DOCTYPE html>
@@ -80,6 +81,9 @@ export async function GET(request: Request) {
         })
         .eq('id', donationId);
 
+      if (ENABLE_SUCCESS_FAILURE_FLOWS) {
+        return NextResponse.redirect(new URL('/commitment/success', request.url));
+      }
       return htmlPage(
         '🎉 Commitment Honored!',
         'Amazing work! Your payment hold has been released. No money was charged — you earned it.',
@@ -99,6 +103,9 @@ export async function GET(request: Request) {
         })
         .eq('id', donationId);
 
+      if (ENABLE_SUCCESS_FAILURE_FLOWS) {
+        return NextResponse.redirect(new URL('/commitment/failure', request.url));
+      }
       return htmlPage(
         'Thanks for being honest',
         'Your payment has been processed and will go to your designated charity. Use this as motivation for next time.',

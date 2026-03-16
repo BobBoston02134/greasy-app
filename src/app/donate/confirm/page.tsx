@@ -23,7 +23,7 @@ export default function DonateConfirmPage() {
     }
   }, [hydrated, isStepComplete, router]);
 
-  const saveCommitment = async (notes: string | null) => {
+  const saveCommitment = async (notes: string | null, isFinal: boolean) => {
     if (!state.paymentIntentId) return;
     setSaving(true);
     setError('');
@@ -31,7 +31,7 @@ export default function DonateConfirmPage() {
       const res = await fetch('/api/donations/commitment', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentIntentId: state.paymentIntentId, notes }),
+        body: JSON.stringify({ paymentIntentId: state.paymentIntentId, notes, isFinal }),
       });
       if (!res.ok) {
         const data = await res.json();
@@ -55,14 +55,16 @@ export default function DonateConfirmPage() {
   const handleNo = async () => {
     setWantsMotivation(false);
     setCommitmentDescription(null);
-    const ok = await saveCommitment(null);
+    // isFinal=true: no anti-charity step, so send confirmation email now
+    const ok = await saveCommitment(null, true);
     if (ok) router.push("/donate/thank-you");
   };
 
   const handleDescriptionSubmit = async () => {
     const trimmed = description.trim() || null;
     setCommitmentDescription(trimmed);
-    const ok = await saveCommitment(trimmed);
+    // isFinal=false: user will still pick anti-charity; email sent at that final step
+    const ok = await saveCommitment(trimmed, false);
     if (ok) router.push("/donate/anti-charity");
   };
 

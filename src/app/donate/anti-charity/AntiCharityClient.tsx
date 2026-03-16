@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDonationFlow } from "@/hooks/useDonationFlow";
 import { SelectionGrid } from "@/components/ui/SelectionGrid";
 import { Button } from "@/components/ui/Button";
@@ -19,6 +19,8 @@ interface AntiCharityClientProps {
 export default function AntiCharityClient({ availableOptions }: AntiCharityClientProps) {
   const router = useRouter();
   const { state, hydrated, setAntiCharity, isStepComplete } = useDonationFlow();
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!hydrated) return;
@@ -32,9 +34,30 @@ export default function AntiCharityClient({ availableOptions }: AntiCharityClien
     (r) => r.value !== state.recipient
   );
 
-  const handleNext = () => {
-    if (state.antiCharity) {
+  const handleNext = async () => {
+    if (!state.antiCharity || !state.paymentIntentId) return;
+    setSaving(true);
+    setError('');
+    try {
+      const res = await fetch('/api/donations/commitment', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paymentIntentId: state.paymentIntentId,
+          antiCharitySlug: state.antiCharity,
+          isFinal: true,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || 'Failed to save anti-charity');
+        setSaving(false);
+        return;
+      }
       router.push("/donate/thank-you");
+    } catch {
+      setError('Something went wrong. Please try again.');
+      setSaving(false);
     }
   };
 
@@ -60,11 +83,16 @@ export default function AntiCharityClient({ availableOptions }: AntiCharityClien
           label="Anti-charity organization"
         />
 
+        {error && (
+          <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>
+        )}
+
         <div className="mt-6">
           <Button
             onClick={handleNext}
             fullWidth
             disabled={!state.antiCharity}
+            isLoading={saving}
           >
             Confirm Anti-Charity
           </Button>

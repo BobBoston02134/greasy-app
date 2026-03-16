@@ -67,6 +67,17 @@ async function sendEmail(to: string, subject: string, html: string): Promise<boo
   return true;
 }
 
+export async function sendAdminAlert(subject: string, body: string): Promise<boolean> {
+  const adminEmail = process.env.ADMIN_ALERT_EMAIL;
+  if (!adminEmail) return false;
+  const html = `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#1f2937">
+    <h2 style="color:#dc2626">${subject}</h2>
+    <pre style="background:#f9fafb;padding:16px;border-radius:8px;font-size:13px;white-space:pre-wrap">${body}</pre>
+    <p style="color:#9ca3af;font-size:12px;margin-top:24px">Greasy automated alert</p>
+  </div>`;
+  return sendEmail(adminEmail, `[Greasy Alert] ${subject}`, html);
+}
+
 export interface ConfirmationEmailParams {
   to: string;
   donorName: string | null;
@@ -111,6 +122,51 @@ export async function sendConfirmationEmail(params: ConfirmationEmailParams): Pr
   `;
 
   return sendEmail(to, `Your commitment is locked in — $${amount} to ${recipientName}`, html);
+}
+
+export interface ReminderEmailParams {
+  to: string;
+  donorName: string | null;
+  amountCents: number;
+  recipientName: string;
+  antiCharityName: string | null;
+  commitmentDescription: string | null;
+  captureAt: string;
+}
+
+export async function sendReminderEmail(params: ReminderEmailParams): Promise<boolean> {
+  const { to, donorName, amountCents, recipientName, antiCharityName, commitmentDescription, captureAt } = params;
+
+  const amount = (amountCents / 100).toFixed(2);
+  const name = donorName || 'there';
+  const deadline = new Date(captureAt).toLocaleDateString('en-US', {
+    weekday: 'long', month: 'long', day: 'numeric',
+  });
+
+  const commitmentSection = commitmentDescription
+    ? `<div style="background:#f9fafb;border-left:4px solid #16a34a;padding:12px 16px;margin:16px 0;border-radius:4px">
+        <p style="margin:0;font-weight:600;color:#15803d">Your commitment:</p>
+        <p style="margin:8px 0 0">${commitmentDescription}</p>
+       </div>`
+    : '';
+
+  const antiCharitySection = antiCharityName
+    ? `<p style="color:#dc2626;margin:16px 0">Remember: if you don't follow through, your $${amount} goes to <strong>${antiCharityName}</strong>.</p>`
+    : '';
+
+  const html = `
+    <div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#1f2937">
+      <h1 style="font-size:24px;font-weight:700;margin-bottom:8px">One week to go, ${name}</h1>
+      <p style="color:#6b7280;margin-bottom:16px">Your $${amount} commitment to <strong>${recipientName}</strong> is due <strong>${deadline}</strong>. You've got one week.</p>
+      ${commitmentSection}
+      ${antiCharitySection}
+      <p style="margin-top:24px;color:#6b7280;font-size:14px">Stay focused. You'll hear from us again as the deadline approaches.</p>
+      <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0"/>
+      <p style="color:#9ca3af;font-size:12px">Greasy — financial accountability for real commitments.</p>
+    </div>
+  `;
+
+  return sendEmail(to, `One week left: your $${amount} commitment to ${recipientName}`, html);
 }
 
 export interface CheckinEmailParams {

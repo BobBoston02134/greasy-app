@@ -34,7 +34,12 @@ export async function GET() {
         fee_cents,
         cover_fees,
         timeframe,
+        capture_at,
         status,
+        commitment_description,
+        commitment_verified,
+        commitment_verified_at,
+        checkin_email_sent,
         created_at,
         charity:charities!charity_id(name),
         anti_charity:charities!anti_charity_id(name)
