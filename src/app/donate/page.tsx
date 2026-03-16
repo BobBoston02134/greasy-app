@@ -1,5 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useDonationFlow } from "@/hooks/useDonationFlow";
 import { SelectionGrid } from "@/components/ui/SelectionGrid";
 import { Button } from "@/components/ui/Button";
@@ -14,7 +15,14 @@ const amountOptions = AMOUNTS.map((a) => ({
 
 export default function DonateAmountPage() {
   const router = useRouter();
+  const { status } = useSession();
   const { state, setAmount } = useDonationFlow();
+
+  if (status === "loading") return null;
+  if (status === "unauthenticated") {
+    router.replace("/join?redirect=/donate");
+    return null;
+  }
   const selectedValue = state.amount !== null ? String(state.amount) : null;
 
   const handleNext = () => {

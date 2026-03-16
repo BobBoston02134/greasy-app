@@ -58,6 +58,19 @@ export function FeedbackWidget() {
     };
 
     saveFeedbackEntry(entry);
+
+    // Fire-and-forget: send to API for email notification
+    fetch("/api/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        feedback: entry.feedback,
+        email: entry.email,
+        page: entry.page,
+        userAgent: entry.userAgent,
+      }),
+    }).catch((err) => console.error("[FeedbackWidget] API call failed:", err));
+
     setSubmitted(true);
 
     // Reset after showing success message

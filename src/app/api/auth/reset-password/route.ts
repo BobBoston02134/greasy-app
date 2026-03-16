@@ -8,6 +8,10 @@ const RESET_SECRET = process.env.EMAIL_VERIFY_SECRET || "";
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "no-reply@greasy.ai";
 
+if (!RESEND_API_KEY) {
+  console.warn("[reset-password] WARNING: RESEND_API_KEY is not set — password reset emails will not be sent.");
+}
+
 // Token expires in 1 hour
 const TOKEN_TTL_MS = 60 * 60 * 1000;
 
@@ -89,7 +93,7 @@ export async function POST(req: NextRequest) {
         </div>
       `;
 
-      await fetch("https://api.resend.com/emails", {
+      const resendRes = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${RESEND_API_KEY}`,
@@ -102,6 +106,11 @@ export async function POST(req: NextRequest) {
           html,
         }),
       });
+
+      if (!resendRes.ok) {
+        const resendError = await resendRes.text();
+        console.error(`[reset-password] Resend API error (${resendRes.status}):`, resendError);
+      }
     }
 
     return NextResponse.json({
