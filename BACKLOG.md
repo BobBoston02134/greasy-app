@@ -10,6 +10,20 @@ Every feature we build should be evaluated against this question: **does this he
 
 ---
 
+## Requires Your Action
+
+These items cannot be completed by the dev team. They require you to log into external dashboards or run manual tests.
+
+- [ ] **Test check-in cron** — hit `/api/cron/send-checkins` on sandbox, verify email arrives in Resend dashboard
+- [ ] **Test Yes/No links** — do a test donation with a deferred timeframe, click both links, verify Stripe captures on "No" and cancels on "Yes"
+- [ ] **End-to-end sandbox test** — full flow: signup → commitment → deadline → capture, with a Stripe test card
+- [ ] **Stripe webhooks** — add `https://greasy.ai/api/stripe/webhook` in Stripe Dashboard with the events listed below
+- [ ] **Admin access** — run `UPDATE users SET is_admin = true WHERE email = 'your@email.com'` in Supabase SQL Editor, then verify `/admin` loads
+- [ ] **DNS** — verify Vercel has `*.getgreasy.ai` and `*.sandbox.getgreasy.ai` domains confirmed; test subdomain routing end to end
+- [ ] **Env var: `ADMIN_ALERT_EMAIL`** — add to Vercel (sandbox + production) — your email address for cron failure alerts
+
+---
+
 ## Pre-Launch Blockers (Must Fix Before Beta)
 
 ### P0 — Hard Blockers
