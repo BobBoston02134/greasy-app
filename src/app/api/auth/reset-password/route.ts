@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { supabase } from "@/lib/supabase";
 import bcrypt from "bcryptjs";
+import { ENABLE_LEAD_CAPTURE_FROM_FORGOT_PASSWORD } from "@/lib/flags";
 
 const APP_URL = process.env.NEXTAUTH_URL || "https://greasy.ai";
 const RESET_SECRET = process.env.EMAIL_VERIFY_SECRET || "";
@@ -115,6 +116,27 @@ export async function POST(req: NextRequest) {
         const resendError = await resendRes.text();
         console.error(`[reset-password] Resend API error (${resendRes.status}):`, resendError);
       }
+
+      if (ENABLE_LEAD_CAPTURE_FROM_FORGOT_PASSWORD) {
+        return NextResponse.json({
+          ok: true,
+          userExists: true,
+          message: "If that email is registered, a reset link is on its way.",
+        });
+      }
+    } else if (!user && ENABLE_LEAD_CAPTURE_FROM_FORGOT_PASSWORD) {
+      try {
+        await supabase
+          .from("leads")
+          .upsert({ email, source: "forgot_password" }, { onConflict: "email,source", ignoreDuplicates: true });
+      } catch (err) {
+        console.error("[reset-password] Lead capture insert failed:", err);
+      }
+      return NextResponse.json({
+        ok: true,
+        userExists: false,
+        message: "If that email is registered, a reset link is on its way.",
+      });
     }
 
     return NextResponse.json({

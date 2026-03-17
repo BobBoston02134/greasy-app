@@ -281,3 +281,20 @@ CREATE TRIGGER update_donations_updated_at
 CREATE TRIGGER update_subscriptions_updated_at
   BEFORE UPDATE ON subscriptions
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- ============================================
+-- LEADS TABLE
+-- Captures emails from unknown users who attempt
+-- password reset. source = where the email came from.
+-- ============================================
+CREATE TABLE IF NOT EXISTS leads (
+  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  email       TEXT        NOT NULL,
+  source      TEXT        NOT NULL DEFAULT 'forgot_password',
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_leads_email_source ON leads(email, source);
+CREATE INDEX IF NOT EXISTS idx_leads_created_at ON leads(created_at);
+
+ALTER TABLE leads ENABLE ROW LEVEL SECURITY;

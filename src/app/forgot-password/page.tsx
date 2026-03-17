@@ -1,14 +1,16 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { ENABLE_LEAD_CAPTURE_FROM_FORGOT_PASSWORD } from "@/lib/flags";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
 function ForgotPasswordContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const token = searchParams.get("token");
 
   // Request-reset state
@@ -45,6 +47,13 @@ function ForgotPasswordContent() {
         const data = await res.json();
         setRequestError(data.error || "Something went wrong.");
       } else {
+        if (ENABLE_LEAD_CAPTURE_FROM_FORGOT_PASSWORD) {
+          const data = await res.json();
+          if (data.userExists === false) {
+            router.push("/join?email=" + encodeURIComponent(email));
+            return;
+          }
+        }
         setRequestSent(true);
       }
     } catch {
