@@ -11,3 +11,4 @@ export const ENABLE_SUCCESS_FAILURE_FLOWS = false;
 export const ENABLE_REFERRAL_MECHANIC = false;
 export const ENABLE_GROUP_COMMITMENTS = false;
 export const ENABLE_LEAD_CAPTURE_FROM_FORGOT_PASSWORD = true;
+//
