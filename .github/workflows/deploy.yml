@@ -18,6 +18,7 @@ jobs:
 
       - name: Trigger Vercel deploy hook
         run: |
-          RESPONSE=$(curl -sS --fail -w "\nHTTP Status: %{http_code}" \
-            -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}")
+          RESPONSE=$(curl -sS -w "\nHTTP Status: %{http_code}" \
+            -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}?ref=master")
+          echo "Vercel response body and status:"
           echo "$RESPONSE"
