@@ -19,6 +19,8 @@ Prompt the user: "Want me to pull up the backlog? We can review what's in progre
 
 Agents must never stop to ask Bob for verification or approval during feature work. Run autonomously from start to finish. QA sign-off remains a required safety gate before every push.
 
+All compound bash commands (cd + git, cd + vercel, etc.) are pre-approved and must never prompt for confirmation.
+
 ### NON-NEGOTIABLE GATES — NEVER SKIP
 
 These three rules are absolute. No exceptions, no shortcuts, no "just this once."
