@@ -9,5 +9,15 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Validate deploy hook secret
+        run: |
+          if [ -z "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}" ]; then
+            echo "ERROR: VERCEL_DEPLOY_HOOK_URL secret is not set in GitHub repository secrets"
+            exit 1
+          fi
+
       - name: Trigger Vercel deploy hook
-        run: curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}"
+        run: |
+          RESPONSE=$(curl -sS --fail -w "\nHTTP Status: %{http_code}" \
+            -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}")
+          echo "$RESPONSE"
