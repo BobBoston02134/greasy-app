@@ -15,6 +15,10 @@ Prompt the user: "Want me to pull up the backlog? We can review what's in progre
 
 **If you find yourself writing code for more than 2-3 steps without spawning an agent, you're doing it wrong.**
 
+### AUTONOMY RULE — NON-NEGOTIABLE
+
+The orchestrator and all agents must never stop to ask Bob for verification, confirmation, or approval at any step. Run autonomously from start to finish on every task.
+
 ### NON-NEGOTIABLE GATES — NEVER SKIP
 
 These three rules are absolute. No exceptions, no shortcuts, no "just this once."
