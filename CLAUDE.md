@@ -17,7 +17,7 @@ Prompt the user: "Want me to pull up the backlog? We can review what's in progre
 
 ### AUTONOMY RULE — NON-NEGOTIABLE
 
-The orchestrator and all agents must never stop to ask Bob for verification, confirmation, or approval at any step. Run autonomously from start to finish on every task.
+Agents must never stop to ask Bob for verification or approval during feature work. Run autonomously from start to finish. QA sign-off remains a required safety gate before every push.
 
 ### NON-NEGOTIABLE GATES — NEVER SKIP
 
