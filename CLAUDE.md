@@ -28,8 +28,17 @@ These three rules are absolute. No exceptions, no shortcuts, no "just this once.
 **GATE 1 — Build check before every commit**
 Before any `git commit`, the orchestrator MUST run `npm run build`. If the build fails, no commit happens. The @full-stack-developer fixes the errors first. This is not optional.
 
-**GATE 2 — @qa-engineer before every push**
+**GATE 2 — @qa-engineer before every push — LIVE TESTING REQUIRED**
 Before any `git push`, the orchestrator MUST spawn @qa-engineer to verify the change works as intended and does not break existing flows. No push without QA sign-off. No task may be marked complete until @qa-engineer has reviewed and signed off.
+
+**Code traces are NOT acceptable QA.** @qa-engineer must run the actual dev server (`npm run dev`) and execute the affected flow end-to-end against a live database. Static analysis of code logic does not count as a pass. If @qa-engineer cannot run a live test, it must explicitly say so and flag the task as UNVERIFIED — never mark it as passed.
+
+Specific requirements:
+- Start `npm run dev` and confirm the server is running
+- Execute the exact user flow affected by the change
+- Confirm expected behavior in the browser or via API response
+- Check the database to verify data was written correctly
+- Only then mark QA as passed
 
 **GATE 3 — Orchestrator never writes code**
 The orchestrator (main Claude thread) does not write implementation code. Ever. If code needs to be written, fixed, or debugged, delegate to @full-stack-developer. If the orchestrator catches itself writing code, it must stop, spawn the right agent, and hand off. Fixing broken code yourself instead of delegating is a workflow violation.
