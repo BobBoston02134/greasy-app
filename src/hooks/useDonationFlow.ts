@@ -50,6 +50,24 @@ export function useDonationFlow() {
         saveState(next);
         return next;
       });
+      // Also eagerly persist to sessionStorage so that navigation that
+      // happens in the same event-handler turn (after an await) reads the
+      // updated value on the destination page, regardless of whether React
+      // has flushed the batched state update yet.
+      if (typeof window !== "undefined") {
+        try {
+          const raw = sessionStorage.getItem(DONATION_STORAGE_KEY);
+          const current: DonationFlowState = raw
+            ? { ...INITIAL_STATE, ...JSON.parse(raw) }
+            : INITIAL_STATE;
+          sessionStorage.setItem(
+            DONATION_STORAGE_KEY,
+            JSON.stringify({ ...current, ...partial })
+          );
+        } catch {
+          // ignore storage errors
+        }
+      }
     },
     []
   );

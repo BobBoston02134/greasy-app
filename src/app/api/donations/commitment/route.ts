@@ -14,20 +14,44 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: 'paymentIntentId required' }, { status: 400 });
     }
 
-    // Fetch the donation
+    // Fetch the donation using only scalar columns to avoid failures caused
+    // by PostgREST join resolution on nullable FKs (anti_charity_id is null
+    // until the user picks one, and the joined-field select can return an
+    // error in some Supabase configurations when the FK is null).
     const { data: donation, error: fetchError } = await supabase
       .from('donations')
       .select(`
         id, commitment_description, donor_email, donor_name, amount_cents,
-        charity:charities!charity_id(name),
-        anti_charity:charities!anti_charity_id(name),
-        timeframe, capture_at
+        charity_id, anti_charity_id, timeframe, capture_at
       `)
       .eq('stripe_payment_intent_id', paymentIntentId)
       .single();
 
     if (fetchError || !donation) {
+      console.error('[Commitment] Donation lookup error:', fetchError, 'paymentIntentId:', paymentIntentId);
       return NextResponse.json({ error: 'Donation not found' }, { status: 404 });
+    }
+
+    // Fetch charity name for confirmation email (separate query avoids join issues)
+    let charityName: string | null = null;
+    let existingAntiCharityName: string | null = null;
+    if (isFinal && donation.donor_email) {
+      if (donation.charity_id) {
+        const { data: charityData } = await supabase
+          .from('charities')
+          .select('name')
+          .eq('id', donation.charity_id)
+          .single();
+        charityName = charityData?.name ?? null;
+      }
+      if (donation.anti_charity_id) {
+        const { data: acData } = await supabase
+          .from('charities')
+          .select('name')
+          .eq('id', donation.anti_charity_id)
+          .single();
+        existingAntiCharityName = acData?.name ?? null;
+      }
     }
 
     // Resolve anti-charity slug to ID if provided
@@ -61,11 +85,9 @@ export async function PATCH(request: Request) {
 
     // Send confirmation email only on the final step of the flow
     if (isFinal && donation.donor_email) {
-      const charityData = donation.charity as unknown as { name: string } | null;
       // Use the newly resolved anti-charity name if this call set it,
-      // otherwise fall back to what was already in the DB.
-      const existingAntiCharityData = donation.anti_charity as unknown as { name: string } | null;
-      let resolvedAntiCharityName: string | null = existingAntiCharityData?.name || null;
+      // otherwise fall back to what was already fetched from the DB.
+      let resolvedAntiCharityName: string | null = existingAntiCharityName;
       if (antiCharitySlug && antiCharityId) {
         // Fetch the name for the newly set anti-charity
         const { data: acNameData } = await supabase
@@ -91,7 +113,7 @@ export async function PATCH(request: Request) {
         to: donation.donor_email,
         donorName: donation.donor_name,
         amountCents: donation.amount_cents,
-        recipientName: charityData?.name || 'your recipient',
+        recipientName: charityName || 'your recipient',
         timeframeLabel: timeframeLabels[donation.timeframe] || donation.timeframe,
         commitmentDescription: notes ?? (donation.commitment_description as string | null),
         hasAntiCharity: !!resolvedAntiCharityName,
