@@ -62,6 +62,7 @@ export default function DonateConfirmPage() {
 
   const handleDescriptionSubmit = async () => {
     const trimmed = description.trim() || null;
+    setWantsMotivation(true);
     setCommitmentDescription(trimmed);
     // isFinal=false: user will still pick anti-charity; email sent at that final step
     const ok = await saveCommitment(trimmed, false);
